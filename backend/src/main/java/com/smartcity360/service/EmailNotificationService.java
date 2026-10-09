@@ -2,29 +2,33 @@ package com.smartcity360.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmailNotificationService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailNotificationService.class);
+    private static final String RESEND_EMAILS_ENDPOINT = "https://api.resend.com/emails";
 
-    private final ObjectProvider<JavaMailSender> mailSenderProvider;
-    private final String mailHost;
+    private final RestClient restClient;
+    private final String apiKey;
     private final String fromAddress;
 
     public EmailNotificationService(
-            ObjectProvider<JavaMailSender> mailSenderProvider,
-            @Value("${spring.mail.host:}") String mailHost,
-            @Value("${app.mail.from:${spring.mail.username:}}") String fromAddress) {
-        this.mailSenderProvider = mailSenderProvider;
-        this.mailHost = mailHost;
+            RestClient.Builder restClientBuilder,
+            @Value("${app.email.resend.api-key:}") String apiKey,
+            @Value("${app.email.from:}") String fromAddress) {
+        this.restClient = restClientBuilder.build();
+        this.apiKey = apiKey;
         this.fromAddress = fromAddress;
     }
 
@@ -34,30 +38,25 @@ public class EmailNotificationService {
             return;
         }
 
-        if (mailHost == null || mailHost.isBlank()) {
-            log.debug("SMTP is not configured; skipping email notification to {}", recipientAddress);
+        if (apiKey == null || apiKey.isBlank() || fromAddress == null || fromAddress.isBlank()) {
+            log.warn("Resend is not configured; skipping email notification to {}", recipientAddress);
             return;
-        }
-
-        JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
-        if (mailSender == null) {
-            log.warn("SMTP is configured but no mail sender is available; skipping email to {}",
-                    recipientAddress);
-            return;
-        }
-
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setTo(recipientAddress);
-        email.setSubject(subject);
-        email.setText(body);
-        if (fromAddress != null && !fromAddress.isBlank()) {
-            email.setFrom(fromAddress);
         }
 
         try {
-            mailSender.send(email);
+            restClient.post()
+                    .uri(RESEND_EMAILS_ENDPOINT)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of(
+                            "from", fromAddress,
+                            "to", List.of(recipientAddress),
+                            "subject", subject,
+                            "text", body))
+                    .retrieve()
+                    .toBodilessEntity();
             log.info("Email notification sent to {}", recipientAddress);
-        } catch (MailException exception) {
+        } catch (RestClientException exception) {
             log.error("Failed to send email notification to {}", recipientAddress, exception);
         }
     }
