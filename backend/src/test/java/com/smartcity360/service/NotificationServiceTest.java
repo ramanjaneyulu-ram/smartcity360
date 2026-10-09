@@ -7,10 +7,6 @@ import com.smartcity360.model.NotificationType;
 import com.smartcity360.model.Role;
 import com.smartcity360.model.User;
 import com.smartcity360.repository.NotificationRepository;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,15 +15,13 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class NotificationServiceTest {
 
     private NotificationRepository notificationRepository;
-    private ObjectProvider<JavaMailSender> mailSenderProvider;
-    private JavaMailSender mailSender;
+    private EmailNotificationService emailNotificationService;
     private NotificationService notificationService;
     private User testUser;
     private Complaint testComplaint;
@@ -35,11 +29,8 @@ class NotificationServiceTest {
     @BeforeEach
     void setUp() {
         notificationRepository = mock(NotificationRepository.class);
-        mailSenderProvider = mock(ObjectProvider.class);
-        mailSender = mock(JavaMailSender.class);
-        when(mailSenderProvider.getIfAvailable()).thenReturn(mailSender);
-        notificationService = new NotificationService(notificationRepository, mailSenderProvider);
-        ReflectionTestUtils.setField(notificationService, "mailHost", "smtp.example.com");
+        emailNotificationService = mock(EmailNotificationService.class);
+        notificationService = new NotificationService(notificationRepository, emailNotificationService);
 
         testUser = User.builder()
                 .id(1L)
@@ -57,7 +48,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void createNotificationSavesAndSendsEmailToLoginAddress() {
+    void createNotificationSavesAndSchedulesEmailToLoginAddress() {
         when(notificationRepository.save(any(Notification.class))).thenAnswer(i -> {
             Notification n = i.getArgument(0);
             n.setId(101L);
@@ -78,11 +69,10 @@ class NotificationServiceTest {
         assertFalse(result.isRead());
         verify(notificationRepository, times(1)).save(any(Notification.class));
 
-        var emailCaptor = forClass(SimpleMailMessage.class);
-        verify(mailSender).send(emailCaptor.capture());
-        assertArrayEquals(new String[]{"citizen@example.com"}, emailCaptor.getValue().getTo());
-        assertEquals("Report Submitted", emailCaptor.getValue().getSubject());
-        assertEquals("Your report has been received.", emailCaptor.getValue().getText());
+        verify(emailNotificationService).sendEmailNotification(
+            "citizen@example.com",
+            "Report Submitted",
+            "Your report has been received.");
     }
 
     @Test

@@ -7,13 +7,6 @@ import com.smartcity360.model.NotificationType;
 import com.smartcity360.model.User;
 import com.smartcity360.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,16 +17,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NotificationService {
 
-    private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
-
     private final NotificationRepository notificationRepository;
-    private final ObjectProvider<JavaMailSender> mailSenderProvider;
-
-    @Value("${spring.mail.host:}")
-    private String mailHost;
-
-    @Value("${app.mail.from:${spring.mail.username:}}")
-    private String fromAddress;
+    private final EmailNotificationService emailNotificationService;
 
     @Transactional
     public Notification createNotification(User recipient, String title, String message,
@@ -53,7 +38,7 @@ public class NotificationService {
 
         Notification saved = notificationRepository.save(notification);
 
-        sendEmailNotification(recipient, title, message);
+        emailNotificationService.sendEmailNotification(recipient.getEmail(), title, message);
 
         return saved;
     }
@@ -90,36 +75,4 @@ public class NotificationService {
         notificationRepository.markAllAsReadForUser(user);
     }
 
-    public void sendEmailNotification(User recipient, String subject, String body) {
-        if (recipient == null || recipient.getEmail() == null || recipient.getEmail().isBlank()) {
-            return;
-        }
-
-        if (mailHost == null || mailHost.isBlank()) {
-            log.debug("SMTP is not configured; skipping email notification to {}", recipient.getEmail());
-            return;
-        }
-
-        JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
-        if (mailSender == null) {
-            log.warn("SMTP is configured but no mail sender is available; skipping email to {}",
-                    recipient.getEmail());
-            return;
-        }
-
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setTo(recipient.getEmail());
-        email.setSubject(subject);
-        email.setText(body);
-        if (fromAddress != null && !fromAddress.isBlank()) {
-            email.setFrom(fromAddress);
-        }
-
-        try {
-            mailSender.send(email);
-            log.info("Email notification sent to {}", recipient.getEmail());
-        } catch (MailException exception) {
-            log.error("Failed to send email notification to {}", recipient.getEmail(), exception);
-        }
-    }
 }
