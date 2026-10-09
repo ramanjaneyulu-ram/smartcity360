@@ -236,4 +236,62 @@ class ComplaintServiceNotificationTest {
                 eq(NotificationType.STATUS_UPDATED)
         );
     }
+
+    @Test
+    void updateStatusDispatchesResolvedNotificationToAdminsWhenOfficerResolves() {
+        Complaint complaint = Complaint.builder()
+                .id(31L)
+                .citizen(citizen)
+                .status(ComplaintStatus.IN_PROGRESS)
+                .build();
+        Assignment assignment = Assignment.builder()
+                .complaint(complaint)
+                .officer(officer)
+                .build();
+        when(complaintRepository.findById(31L)).thenReturn(Optional.of(complaint));
+        when(assignmentRepository.findByComplaint(complaint)).thenReturn(Optional.of(assignment));
+        when(complaintRepository.save(any(Complaint.class))).thenAnswer(i -> i.getArgument(0));
+        when(resolutionRepository.findByComplaint(complaint)).thenReturn(Optional.empty());
+        when(userRepository.findByRole(Role.ADMIN)).thenReturn(List.of(admin));
+
+        StatusUpdateRequest req = new StatusUpdateRequest();
+        req.setStatus(ComplaintStatus.RESOLVED);
+        req.setResolutionNote("Repair completed.");
+
+        complaintService.updateStatus(31L, req, officer);
+
+        verify(notificationService).createNotification(
+                eq(admin),
+                eq("Complaint Resolved"),
+                contains("SC-20031"),
+                eq(complaint),
+                eq(NotificationType.STATUS_UPDATED)
+        );
+    }
+
+    @Test
+    void submitFeedbackDispatchesNotificationToAdmins() {
+        Complaint complaint = Complaint.builder()
+                .id(32L)
+                .citizen(citizen)
+                .status(ComplaintStatus.RESOLVED)
+                .build();
+        when(complaintRepository.findById(32L)).thenReturn(Optional.of(complaint));
+        when(assignmentRepository.findByComplaint(complaint)).thenReturn(Optional.empty());
+        when(userRepository.findByRole(Role.ADMIN)).thenReturn(List.of(admin));
+
+        com.smartcity360.dto.FeedbackRequest req = new com.smartcity360.dto.FeedbackRequest();
+        req.setRating(5);
+        req.setComment("Fixed quickly.");
+
+        complaintService.submitFeedback(32L, req, citizen);
+
+        verify(notificationService).createNotification(
+                eq(admin),
+                eq("Citizen Feedback Received"),
+                contains("5/5"),
+                eq(complaint),
+                eq(NotificationType.FEEDBACK_RECEIVED)
+        );
+    }
 }

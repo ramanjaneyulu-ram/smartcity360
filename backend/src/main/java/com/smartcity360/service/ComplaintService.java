@@ -196,6 +196,18 @@ public class ComplaintService {
                 NotificationType.STATUS_UPDATED
         );
 
+        if (req.getStatus() == ComplaintStatus.RESOLVED) {
+            userRepository.findByRole(Role.ADMIN).stream()
+                .filter(admin -> !admin.getId().equals(actor.getId()))
+                .forEach(admin -> notificationService.createNotification(
+                    admin,
+                    "Complaint Resolved",
+                    "Complaint " + publicId + " was marked resolved by " + actor.getName() + ".",
+                    complaint,
+                    NotificationType.STATUS_UPDATED
+                ));
+        }
+
         return toResponse(complaint);
     }
 
@@ -227,6 +239,16 @@ public class ComplaintService {
                     NotificationType.FEEDBACK_RECEIVED
             );
         });
+
+                userRepository.findByRole(Role.ADMIN).forEach(admin ->
+                    notificationService.createNotification(
+                        admin,
+                        "Citizen Feedback Received",
+                        citizen.getName() + " submitted a " + req.getRating() + "/5 rating on complaint " + publicId + ".",
+                        complaint,
+                        NotificationType.FEEDBACK_RECEIVED
+                    )
+                );
 
         return toResponse(complaint);
     }

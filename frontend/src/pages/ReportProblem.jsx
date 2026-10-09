@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import client from '../api/client';
 import Chip from '../components/Chip';
-import { IconUpload, IconPin, IconSpark } from '../components/Icons';
+import { IconUpload, IconCamera, IconPin, IconSpark } from '../components/Icons';
 
 export default function ReportProblem() {
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ export default function ReportProblem() {
   const [coordinates, setCoordinates] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
   const debounceRef = useRef(null);
 
   useEffect(() => {
@@ -140,6 +141,14 @@ export default function ReportProblem() {
           <div className="field">
             <label>Photo or video</label>
             <input
+              ref={cameraInputRef}
+              className="file-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={(event) => setSelectedFile(event.target.files?.[0] || null)}
+            />
+            <input
               ref={fileInputRef}
               className="file-input"
               type="file"
@@ -154,6 +163,10 @@ export default function ReportProblem() {
               <IconUpload />
               <div>{selectedFile ? selectedFile.name : 'Drag a photo here, or click to upload'}</div>
             </div>
+            <button className="btn btn-ghost btn-sm" type="button" style={{ marginTop: 8 }}
+              onClick={() => cameraInputRef.current?.click()} disabled={submitting}>
+              <IconCamera aria-hidden="true" /> Take photo
+            </button>
           </div>
           <div className="field">
             <label>Location</label>
