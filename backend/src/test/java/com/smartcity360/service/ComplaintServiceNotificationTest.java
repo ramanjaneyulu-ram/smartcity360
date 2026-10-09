@@ -160,7 +160,10 @@ class ComplaintServiceNotificationTest {
         verify(notificationService).createNotification(
                 eq(admin),
                 eq("New Complaint Submitted"),
-                contains("SC-20011"),
+                org.mockito.ArgumentMatchers.argThat(message ->
+                        message.contains("Priya")
+                                && message.contains("SC-20011")
+                                && message.contains("Public Works")),
                 any(Complaint.class),
                 eq(NotificationType.SYSTEM_ALERT)
         );

@@ -60,7 +60,8 @@ public class ComplaintService {
                 notificationService.createNotification(
                         admin,
                         "New Complaint Submitted",
-                        "A new citizen complaint (" + publicId + ") has been submitted for " + savedComplaint.getDepartment() + ".",
+                        citizen.getName() + " submitted a complaint (" + publicId + ") for "
+                            + savedComplaint.getDepartment() + ".",
                         savedComplaint,
                         NotificationType.SYSTEM_ALERT
                 )
