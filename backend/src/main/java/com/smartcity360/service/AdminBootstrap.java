@@ -18,16 +18,19 @@ public class AdminBootstrap implements ApplicationRunner {
     private final PasswordEncoder passwordEncoder;
     private final String email;
     private final String password;
+    private final boolean resetPassword;
 
     public AdminBootstrap(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             @Value("${app.bootstrap-admin.email:}") String email,
-            @Value("${app.bootstrap-admin.password:}") String password) {
+            @Value("${app.bootstrap-admin.password:}") String password,
+            @Value("${app.bootstrap-admin.reset-password:false}") boolean resetPassword) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.email = email;
         this.password = password;
+        this.resetPassword = resetPassword;
     }
 
     @Override
@@ -47,6 +50,10 @@ public class AdminBootstrap implements ApplicationRunner {
         if (existingUser != null) {
             if (existingUser.getRole() != Role.ADMIN) {
                 throw new IllegalStateException("Bootstrap admin email is already used by a non-admin account.");
+            }
+            if (resetPassword) {
+                existingUser.setPassword(passwordEncoder.encode(password));
+                userRepository.save(existingUser);
             }
             return;
         }
