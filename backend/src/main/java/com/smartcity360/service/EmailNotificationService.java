@@ -20,14 +20,17 @@ public class EmailNotificationService {
     private final RestClient restClient;
     private final String apiKey;
     private final String fromAddress;
+    private final String frontendUrl;
 
     public EmailNotificationService(
             RestClient.Builder restClientBuilder,
             @Value("${app.email.resend.api-key:}") String apiKey,
-            @Value("${app.email.from:}") String fromAddress) {
+            @Value("${app.email.from:}") String fromAddress,
+            @Value("${app.frontend.url:https://smartcity360-oqd7.vercel.app}") String frontendUrl) {
         this.restClient = restClientBuilder.baseUrl("https://api.resend.com").build();
         this.apiKey = apiKey;
         this.fromAddress = fromAddress;
+        this.frontendUrl = frontendUrl.replaceAll("/+$", "");
     }
 
     @Async
@@ -55,7 +58,8 @@ public class EmailNotificationService {
                             "from", fromAddress,
                             "to", List.of(recipientAddress),
                             "subject", subject,
-                            "text", body))
+                                "text", body + "\n\nSign in to SmartCity 360 to view details:\n"
+                                    + frontendUrl + "/login"))
                     .retrieve()
                     .toBodilessEntity();
             log.info("Email notification sent to {}", recipientAddress);

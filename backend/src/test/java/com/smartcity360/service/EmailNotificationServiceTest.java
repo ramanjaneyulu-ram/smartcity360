@@ -27,11 +27,11 @@ class EmailNotificationServiceTest {
         .andExpect(method(POST))
         .andExpect(header("Authorization", "Bearer test-api-key"))
         .andExpect(content().json("""
-            {"from":"alerts@example.com","to":["admin@example.com"],"subject":"Complaint Resolved","text":"A complaint was resolved."}
+            {"from":"alerts@example.com","to":["admin@example.com"],"subject":"Complaint Resolved","text":"A complaint was resolved.\n\nSign in to SmartCity 360 to view details:\nhttps://smartcity360-oqd7.vercel.app/login"}
             """))
         .andRespond(withSuccess("{}", APPLICATION_JSON));
     EmailNotificationService service = new EmailNotificationService(
-        builder, "test-api-key", "alerts@example.com");
+        builder, "test-api-key", "alerts@example.com", "https://smartcity360-oqd7.vercel.app/");
 
         service.sendEmailNotification("admin@example.com", "Complaint Resolved", "A complaint was resolved.");
 
@@ -45,7 +45,7 @@ class EmailNotificationServiceTest {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         EmailNotificationService service = new EmailNotificationService(
-            builder, "test-api-key", "alerts@example.com");
+            builder, "test-api-key", "alerts@example.com", "https://smartcity360-oqd7.vercel.app");
 
         service.sendEmailNotification(recipientAddress, "Complaint Resolved", "A complaint was resolved.");
 
@@ -59,7 +59,7 @@ class EmailNotificationServiceTest {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         EmailNotificationService service = new EmailNotificationService(
-            builder, "test-api-key", fromAddress);
+            builder, "test-api-key", fromAddress, "https://smartcity360-oqd7.vercel.app");
 
         service.sendEmailNotification("admin@example.com", "Complaint Resolved", "A complaint was resolved.");
 
@@ -71,7 +71,7 @@ class EmailNotificationServiceTest {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         EmailNotificationService service = new EmailNotificationService(
-                builder, "", "alerts@example.com");
+            builder, "", "alerts@example.com", "https://smartcity360-oqd7.vercel.app");
 
         service.sendEmailNotification("admin@example.com", "Complaint Resolved", "A complaint was resolved.");
 
@@ -85,7 +85,7 @@ class EmailNotificationServiceTest {
         server.expect(requestTo("https://api.resend.com/emails"))
             .andRespond(withServerError());
         EmailNotificationService service = new EmailNotificationService(
-            builder, "test-api-key", "alerts@example.com");
+            builder, "test-api-key", "alerts@example.com", "https://smartcity360-oqd7.vercel.app");
 
         assertDoesNotThrow(() ->
                 service.sendEmailNotification("admin@example.com", "Complaint Resolved", "A complaint was resolved."));
