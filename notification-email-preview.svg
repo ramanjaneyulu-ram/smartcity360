@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="760" viewBox="0 0 1000 760" role="img" aria-labelledby="title description">
+  <title id="title">SmartCity 360 notification email preview</title>
+  <desc id="description">Illustrative inbox showing sample report, feedback, and resolution emails sent to an administrator.</desc>
+  <rect width="1000" height="760" fill="#f2f5f4"/>
+  <rect x="0" y="0" width="1000" height="70" fill="#103a33"/>
+  <rect x="38" y="17" width="36" height="36" rx="9" fill="#e48b37"/>
+  <path d="M47 35l9-9 9 9M49 34v11h14V34" fill="none" stroke="#231b11" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="88" y="34" fill="#ffffff" font-family="Georgia,serif" font-size="23" font-weight="700">SmartCity 360</text>
+  <text x="88" y="53" fill="#c5d5d0" font-family="Arial,sans-serif" font-size="12">NOTIFICATION EMAIL PREVIEW</text>
+  <rect x="40" y="100" width="920" height="620" rx="14" fill="#ffffff" stroke="#d7e0dc"/>
+  <text x="72" y="143" fill="#173c35" font-family="Arial,sans-serif" font-size="22" font-weight="700">Inbox</text>
+  <text x="72" y="170" fill="#687772" font-family="Arial,sans-serif" font-size="13">Example messages an admin may receive</text>
+  <line x1="72" y1="194" x2="928" y2="194" stroke="#e4eae7"/>
+  <rect x="72" y="218" width="856" height="116" rx="9" fill="#f6f8f7" stroke="#e4eae7"/>
+  <circle cx="105" cy="253" r="16" fill="#e48b37"/>
+  <text x="105" y="258" text-anchor="middle" fill="#ffffff" font-family="Arial,sans-serif" font-size="12" font-weight="700">S</text>
+  <text x="137" y="250" fill="#253a35" font-family="Arial,sans-serif" font-size="14" font-weight="700">SmartCity 360</text>
+  <text x="137" y="275" fill="#263b36" font-family="Arial,sans-serif" font-size="16" font-weight="700">New Complaint Submitted</text>
+  <text x="137" y="300" fill="#64716d" font-family="Arial,sans-serif" font-size="14">A new citizen complaint (SC-20010) has been submitted for Electrical.</text>
+  <text x="892" y="250" text-anchor="end" fill="#89938f" font-family="Arial,sans-serif" font-size="12">Sample</text>
+  <rect x="72" y="350" width="856" height="116" rx="9" fill="#f6f8f7" stroke="#e4eae7"/>
+  <circle cx="105" cy="385" r="16" fill="#e48b37"/>
+  <text x="105" y="390" text-anchor="middle" fill="#ffffff" font-family="Arial,sans-serif" font-size="12" font-weight="700">S</text>
+  <text x="137" y="382" fill="#253a35" font-family="Arial,sans-serif" font-size="14" font-weight="700">SmartCity 360</text>
+  <text x="137" y="407" fill="#263b36" font-family="Arial,sans-serif" font-size="16" font-weight="700">Citizen Feedback Received</text>
+  <text x="137" y="432" fill="#64716d" font-family="Arial,sans-serif" font-size="14">A citizen submitted a 5/5 rating on complaint SC-20010.</text>
+  <text x="892" y="382" text-anchor="end" fill="#89938f" font-family="Arial,sans-serif" font-size="12">Sample</text>
+  <rect x="72" y="482" width="856" height="116" rx="9" fill="#f6f8f7" stroke="#e4eae7"/>
+  <circle cx="105" cy="517" r="16" fill="#e48b37"/>
+  <text x="105" y="522" text-anchor="middle" fill="#ffffff" font-family="Arial,sans-serif" font-size="12" font-weight="700">S</text>
+  <text x="137" y="514" fill="#253a35" font-family="Arial,sans-serif" font-size="14" font-weight="700">SmartCity 360</text>
+  <text x="137" y="539" fill="#263b36" font-family="Arial,sans-serif" font-size="16" font-weight="700">Complaint Resolved</text>
+  <text x="137" y="564" fill="#64716d" font-family="Arial,sans-serif" font-size="14">Complaint SC-20010 was marked resolved by the assigned officer.</text>
+  <text x="892" y="514" text-anchor="end" fill="#89938f" font-family="Arial,sans-serif" font-size="12">Sample</text>
+  <line x1="72" y1="630" x2="928" y2="630" stroke="#e4eae7"/>
+  <text x="72" y="663" fill="#687772" font-family="Arial,sans-serif" font-size="13">The recipient is the email address saved on the admin account.</text>
+  <text x="72" y="685" fill="#687772" font-family="Arial,sans-serif" font-size="13">Sender address comes from the MAIL_FROM / MAIL_USERNAME configuration.</text>
+</svg>

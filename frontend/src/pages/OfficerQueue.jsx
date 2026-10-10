@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import client from '../api/client';
+import { formatApiDateTime } from '../utils/dateTime';
 import { useAuth } from '../context/AuthContext';
 import Chip from '../components/Chip';
 import { IconRefresh, IconUpload } from '../components/Icons';
@@ -176,5 +177,5 @@ export default function OfficerQueue() {
 }
 
 function formatSla(value) {
-  return value ? new Date(value).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Not set';
+  return value ? formatApiDateTime(value) : 'Not set';
 }

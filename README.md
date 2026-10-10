@@ -95,3 +95,8 @@ smartcity360/
 │
 ├── .gitignore
 └── README.md
+```
+
+## Email Notifications
+
+The backend sends notification emails through Resend. Configure `RESEND_API_KEY` and `RESEND_FROM` in the backend hosting environment. `RESEND_FROM` must be a sender address verified in Resend; the Resend onboarding test sender can only deliver to an address verified by that Resend account. Complaint emails are sent to the email address stored on each user with the `ADMIN` role, so verify the admin account's registered email address as well. In-app notifications do not depend on these email settings.

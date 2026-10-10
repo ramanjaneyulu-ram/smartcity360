@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import client from '../api/client';
+import { formatApiDateTime, parseApiDate } from '../utils/dateTime';
 import Chip from '../components/Chip';
 
 const STEPS = ['SUBMITTED', 'CLASSIFIED', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'VERIFIED'];
@@ -99,7 +100,7 @@ export default function TrackReports() {
           <div>
             <div className="track-head" style={{ marginBottom: 14, flexDirection: 'column', alignItems: 'flex-start' }}>
               <h1 style={{ fontSize: 19 }}>{selected.description}</h1>
-              <div className="meta">{selected.publicId} · Submitted {new Date(selected.createdAt).toLocaleDateString()}</div>
+              <div className="meta">{selected.publicId} · Submitted {parseApiDate(selected.createdAt)?.toLocaleDateString()}</div>
             </div>
 
             <div className="card" style={{ padding: '6px 14px 14px' }}>
@@ -164,7 +165,7 @@ export default function TrackReports() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>{n.title}</span>
                         <span style={{ fontSize: 11, color: 'var(--ink-soft)' }}>
-                          {n.createdAt ? new Date(n.createdAt).toLocaleDateString() + ' ' + new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                          {formatApiDateTime(n.createdAt)}
                         </span>
                       </div>
                       <div style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 2 }}>{n.message}</div>
@@ -206,5 +207,5 @@ export default function TrackReports() {
 }
 
 function formatDateTime(value) {
-  return new Date(value).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+  return formatApiDateTime(value);
 }

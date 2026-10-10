@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { IconBell } from './Icons';
+import { formatApiDateTime } from '../utils/dateTime';
 
 export default function NotificationCenter() {
   const { user } = useAuth();
@@ -136,7 +137,7 @@ export default function NotificationCenter() {
                   <div className="notif-item-top">
                     <span className="notif-item-title">{n.title}</span>
                     <span className="notif-time">
-                      {n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                      {formatApiDateTime(n.createdAt, { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                   <div className="notif-item-msg">{n.message}</div>
