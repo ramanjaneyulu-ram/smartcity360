@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 public class EmailNotificationService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailNotificationService.class);
+    private static final int MAX_SEND_ATTEMPTS = 3;
+    private static final long RETRY_DELAY_MS = 1000;
 
     private final JavaMailSender mailSender;
     private final String fromAddress;
@@ -35,16 +37,34 @@ public class EmailNotificationService {
             return;
         }
 
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromAddress);
-            message.setTo(recipientAddress);
-            message.setSubject(subject);
-            message.setText(body);
-            mailSender.send(message);
-            log.info("Email notification sent to {}", recipientAddress);
-        } catch (MailException exception) {
-            log.error("Failed to send email notification to {}", recipientAddress, exception);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromAddress);
+        message.setTo(recipientAddress);
+        message.setSubject(subject);
+        message.setText(body);
+
+        for (int attempt = 1; attempt <= MAX_SEND_ATTEMPTS; attempt++) {
+            try {
+                mailSender.send(message);
+                log.info("Email notification sent to {}", recipientAddress);
+                return;
+            } catch (MailException exception) {
+                if (attempt == MAX_SEND_ATTEMPTS) {
+                    log.error("Email notification to {} failed after {} attempts",
+                            recipientAddress, MAX_SEND_ATTEMPTS, exception);
+                    return;
+                }
+
+                log.warn("Email notification to {} failed on attempt {}; retrying",
+                        recipientAddress, attempt, exception);
+                try {
+                    Thread.sleep(RETRY_DELAY_MS * attempt);
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread().interrupt();
+                    log.warn("Retry interrupted for email notification to {}", recipientAddress);
+                    return;
+                }
+            }
         }
     }
 }
